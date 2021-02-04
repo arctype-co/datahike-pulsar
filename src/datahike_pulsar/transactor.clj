@@ -8,7 +8,6 @@
   (:import
     (java.nio ByteBuffer)
     (org.apache.pulsar.client.api PulsarClient Producer Consumer Message MessageId PulsarClientException$AlreadyClosedException AuthenticationFactory)
-    (java.util UUID)
     (java.util.function BiFunction)
     (java.util.concurrent TimeUnit TimeoutException)))
 
