@@ -8,12 +8,17 @@
   (:import
     (java.nio ByteBuffer)
     (org.apache.pulsar.client.api PulsarClient Producer Consumer Message MessageId PulsarClientException$AlreadyClosedException AuthenticationFactory)
-    (java.util.function BiFunction)
+    (java.util.function Function BiFunction)
     (java.util.concurrent TimeUnit TimeoutException)))
 
 (defn- wrap-message-id
   [^MessageId message-id]
   (-> message-id (.toByteArray) (ByteBuffer/wrap)))
+
+(def ^:private log-ack-failure
+  (reify Function
+    (apply [_ error]
+      (log/warn error "Failed to acknowledge Pulsar message"))))
 
 (defn create-rx-thread
   [connection ^Consumer consumer callbacks consumer-poll-timeout-ms update-and-flush-db]
@@ -31,10 +36,12 @@
                                  ; Only catch ExceptionInfo here (intentionally rejected transactions).
                                  ; Any other exceptions should crash the transactor and signal the supervisor.
                                  (catch clojure.lang.ExceptionInfo e e))
+                  ack (.acknowledgeCumulativeAsync consumer (.getMessageId msg))
                   callback (dosync
                              (let [cb (get @callbacks message-id)]
                                (alter callbacks dissoc message-id)
                                cb))]
+              (.exceptionally ack log-ack-failure)
               (if (some? callback)
                 (do
                   (log/debug "Callback matched")
