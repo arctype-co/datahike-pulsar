@@ -7,7 +7,7 @@
     [taoensso.nippy :as nippy])
   (:import
     (java.nio ByteBuffer)
-    (org.apache.pulsar.client.api PulsarClient Producer Consumer Message MessageId PulsarClientException$AlreadyClosedException AuthenticationFactory)
+    (org.apache.pulsar.client.api PulsarClient Producer Consumer Message MessageId PulsarClientException$AlreadyClosedException AuthenticationFactory SubscriptionType SubscriptionInitialPosition)
     (java.util.function Function BiFunction)
     (java.util.concurrent TimeUnit TimeoutException)))
 
@@ -116,7 +116,10 @@
         producer (-> pulsar (.newProducer) (.topic (:topic pulsar-config)) (.create))
         ^Consumer consumer (-> pulsar
                                (.newConsumer) (.topic (into-array String [(:topic pulsar-config)]))
-                               (.subscriptionName subscription-id) (.subscribe))
+                               (.subscriptionName subscription-id) 
+                               (.subscriptionType SubscriptionType/Exclusive)
+                               (.subscriptionInitialPosition SubscriptionInitialPosition/Earliest)
+                               (.subscribe))
         callbacks (ref {})
         rx-thread (create-rx-thread connection consumer callbacks
                                     consumer-poll-timeout-ms
