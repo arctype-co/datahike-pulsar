@@ -1,6 +1,6 @@
 {:deps {org.clojure/clojure {:mvn/version "1.10.1"}
         com.taoensso/nippy {:mvn/version "3.1.1"}
-        io.replikativ/datahike {:mvn/version "0.3.4-arctype-SNAPSHOT"}
+        io.replikativ/datahike {:mvn/version "0.3.4-arctype-dev"}
         io.replikativ/superv.async {:mvn/version "0.2.11"}
         org.apache.pulsar/pulsar-client {:mvn/version "2.7.0"}}
 
