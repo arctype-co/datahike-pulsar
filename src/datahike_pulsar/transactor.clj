@@ -62,6 +62,9 @@
           (:token pulsar-config)
           (.authentication (AuthenticationFactory/token ^String (:token pulsar-config)))
 
+          (:auth-factory pulsar-config)
+          (.authentication (:auth-factory pulsar-config))
+
           true (.build)))
 
 (defrecord PulsarTransactor
