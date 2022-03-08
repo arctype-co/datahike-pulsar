@@ -13,7 +13,7 @@
                                :pom-file "pom.xml"
                                :artifact-id "datahike-pulsar"
                                :group-id "arctype"
-                               :version "0.1.0-SNAPSHOT"}}
+                               :version "0.1.0"}}
 
            :install {:extra-deps {slipset/deps-deploy {:mvn/version "0.1.5"}}
                      :exec-fn deps-deploy.deps-deploy/deploy
