@@ -29,10 +29,12 @@
         (loop []
           (when-let [^Message msg (.receive consumer consumer-poll-timeout-ms TimeUnit/MILLISECONDS)]
             (let [message-id (wrap-message-id (.getMessageId msg))
-                  {:keys [tx-data tx-fn]} (-> (.getData msg) (nippy/thaw))
-                  _ (log/debug "Pulsar message received" {:tx-data tx-data :tx-fn tx-fn})
+                  {:keys [tx-data tx-meta tx-fn]} (-> (.getData msg) (nippy/thaw))
+                  _ (log/debug "Pulsar message received" {:tx-data tx-data
+                                                          :tx-meta tx-meta
+                                                          :tx-fn tx-fn})
                   update-fn (resolve-fn tx-fn)
-                  tx-report (try (update-and-flush-db connection tx-data update-fn)
+                  tx-report (try (update-and-flush-db connection tx-data tx-meta update-fn)
                                  ; Only catch ExceptionInfo here (intentionally rejected transactions).
                                  ; Any other exceptions should crash the transactor and signal the supervisor.
                                  (catch clojure.lang.ExceptionInfo e e))
@@ -70,12 +72,13 @@
 (defrecord PulsarTransactor
   [^PulsarClient pulsar ^Producer producer ^Consumer consumer callbacks rx-thread transaction-rtt-timeout-ms]
   PTransactor
-  (send-transaction! [_ tx-data update-fn]
+  (send-transaction! [_ tx-data tx-meta tx-fn]
     (go
       (let [p (promise-chan)
             timeout (timeout transaction-rtt-timeout-ms)
             tx-envelope
-            {:tx-fn update-fn
+            {:tx-fn tx-fn
+             :tx-meta tx-meta
              :tx-data tx-data}
             buf (nippy/freeze tx-envelope)]
         (doto (.sendAsync producer buf)
