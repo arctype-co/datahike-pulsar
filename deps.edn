@@ -15,7 +15,14 @@
                                :group-id "arctype"
                                :version "0.1.0"}}
 
-           :install {:extra-deps {slipset/deps-deploy {:mvn/version "0.1.5"}}
+           :install {:extra-deps {slipset/deps-deploy {:mvn/version "0.2.0"}}
                      :exec-fn deps-deploy.deps-deploy/deploy
                      :exec-args {:installer :local
-                                 :artifact "datahike-pulsar.jar"}}}}
+                                 :sign-releases? true
+                                 :artifact "datahike-pulsar.jar"}}
+
+           :deploy {:extra-deps {slipset/deps-deploy {:mvn/version "0.2.0"}}
+                    :exec-fn deps-deploy.deps-deploy/deploy
+                    :exec-args {:installer :remote
+                                :sign-releases? true
+                                :artifact "datahike-pulsar.jar"}}}}
