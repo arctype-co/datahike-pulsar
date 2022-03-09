@@ -56,18 +56,20 @@
 
 (defn- create-pulsar-client
   [pulsar-config]
-  (cond-> (PulsarClient/builder)
+  (or 
+    (:client pulsar-config)
+    (cond-> (PulsarClient/builder)
 
-          (:url pulsar-config)
-          (.serviceUrl (:url pulsar-config))
+      (:url pulsar-config)
+      (.serviceUrl (:url pulsar-config))
 
-          (:token pulsar-config)
-          (.authentication (AuthenticationFactory/token ^String (:token pulsar-config)))
+      (:token pulsar-config)
+      (.authentication (AuthenticationFactory/token ^String (:token pulsar-config)))
 
-          (:auth-factory pulsar-config)
-          (.authentication (:auth-factory pulsar-config))
+      (:auth-factory pulsar-config)
+      (.authentication (:auth-factory pulsar-config))
 
-          true (.build)))
+      true (.build))))
 
 (defrecord PulsarTransactor
   [^PulsarClient pulsar ^Producer producer ^Consumer consumer callbacks rx-thread transaction-rtt-timeout-ms]
