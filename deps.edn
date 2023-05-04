@@ -5,11 +5,11 @@
         org.apache.pulsar/pulsar-client {:mvn/version "2.7.0"}}
 
  :mvn/repos {#_GUIX_MAVEN_INPUTS}
- 
+
  :aliases {:build {:replace-deps {com.github.seancorfield/depstar {:mvn/version "2.0.193"}}
                    :exec-fn hf.depstar/jar
                    :exec-args {:jar "datahike-pulsar.jar"
-                               :sync-pom false
+                               :sync-pom true
                                :pom-file "pom.xml"
                                :artifact-id "datahike-pulsar"
                                :group-id "arctype"
